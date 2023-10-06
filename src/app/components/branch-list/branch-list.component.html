@@ -1,0 +1,14 @@
+<table>
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Ubicación</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let branch of branches">
+      <td>{{ branch.name }}</td>
+      <td (click)="openBranch(branch.id || '')">{{ branch.location }}</td>
+    </tr>
+  </tbody>
+</table>

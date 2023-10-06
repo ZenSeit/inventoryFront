@@ -1,0 +1,16 @@
+<table>
+  <thead>
+    <tr>
+      <th>Fecha</th>
+      <th>Total</th>
+      <th>Tipo de venta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let invoice of invoices">
+      <td>{{ invoice.date  | date:'short'  }}</td>
+      <td >{{ invoice.total }}</td>
+      <td >{{ invoice.sellType}}</td>
+    </tr>
+  </tbody>
+</table>
