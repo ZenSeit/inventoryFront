@@ -10,6 +10,7 @@ import { HomePageComponent } from './pages/HomePage/HomePage.component';
 import { ProductListComponent } from './components/product-list/product-list.component';
 import { BranchPageComponent } from './pages/BranchPage/BranchPage.component';
 import { InvoiceListComponent } from './components/invoice-list/invoice-list.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { InvoiceListComponent } from './components/invoice-list/invoice-list.com
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
+    ReactiveFormsModule
 
   ],
   providers: [],

@@ -1,4 +1,7 @@
-<table>
+<div *ngIf="productsInBranch.length === 0">
+  <p>There are no products in this branch. Add one</p>
+</div>
+<table *ngIf="productsInBranch.length > 0"  class="table table-dark table-hover">
   <thead>
     <tr>
       <th>Nombre</th>
@@ -6,16 +9,172 @@
       <th>Stock</th>
       <th>Precio</th>
       <th>Categoria</th>
+      <th>Action</th>
     </tr>
   </thead>
   <tbody>
     <tr *ngFor="let product of productsInBranch">
       <td>{{ product.name }}</td>
-      <td >{{ product.description }}</td>
-      <td >{{ product.inventoryStock || 0 }}</td>
-      <td >{{ product.price }}</td>
-      <td >{{ product.category }}</td>
-      
+      <td>{{ product.description }}</td>
+      <td>{{ product.inventoryStock || 0 }}</td>
+      <td>{{ product.price }}</td>
+      <td>{{ product.category }}</td>
+      <td>
+        <button
+          type="button"
+          (click)="selectProduct(product)"
+          class="btn btn-warning"
+          data-bs-toggle="modal"
+          data-bs-target="#addStockModal"
+        >
+          +
+        </button>
+        <button *ngIf="product.inventoryStock > 0"
+          type="button"
+          (click)="orderProduct(product)"
+          class="btn btn-success"
+          data-bs-toggle="modal"
+          data-bs-target="#createOrderModal"
+        >
+          Order
+        </button>
+      </td>
     </tr>
   </tbody>
+  <div
+    class="modal fade"
+    id="addStockModal"
+    tabindex="-1"
+    aria-labelledby="addStockModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addStockModalLabel">
+            {{ ProductSelected?.name }}
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form
+            [formGroup]="productForm"
+            (ngSubmit)="!productForm.invalid && onSubmit(productForm.value)"
+          >
+            <div class="form-group">
+              <label for="quantity">Quantity:</label>
+              <input
+                id="quantity"
+                type="number"
+                class="form-control"
+                formControlName="quantity"
+                placeholder="Ingresa la cantidad"
+              />
+              <div
+                *ngIf="productForm.get('quantity')?.hasError('required')"
+                class="alert alert-danger mt-2"
+              >
+                quantity is required.
+              </div>
+              <div
+                *ngIf="productForm.get('quantity')?.hasError('min')"
+                class="alert alert-danger mt-2"
+              >
+                quantity must be at least 1.
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="!productForm.valid"
+              data-bs-dismiss="modal"
+            >
+              Guardar
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="modal fade"
+    id="createOrderModal"
+    tabindex="-1"
+    aria-labelledby="createOrderModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="createOrderModalLabel">
+            {{ productOrder?.name }}
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form
+            [formGroup]="orderForm"
+            (ngSubmit)="!orderForm.invalid && makeOrder(orderForm.value)"
+          >
+            <div class="form-group">
+              <label for="quantity">Quantity:</label>
+              <input
+                id="quantity"
+                type="number"
+                class="form-control"
+                formControlName="quantity"
+                placeholder="Ingresa la cantidad"
+              />
+              <div
+                *ngIf="orderForm.get('quantity')?.hasError('required')"
+                class="alert alert-danger mt-2"
+              >
+                Quantity is required.
+              </div>
+              <div
+                *ngIf="orderForm.get('quantity')?.hasError('min')"
+                class="alert alert-danger mt-2"
+              >
+                Quantity must be at least 1.
+              </div>
+            </div>
+
+            <label for="typeOrder">Type order</label>
+          <select class="form-control" id="typeOrder" formControlName="typeOrder">
+            <option value="" disabled>Select a type</option>
+            <option value="customer">Customer</option>
+            <option value="reseller">Reseller</option>
+            <!-- Agrega más opciones según sea necesario -->
+          </select>
+          <div
+            class="alert alert-danger alert-dismissible fade show"
+            *ngIf="orderForm.get('typeOrder')?.hasError('required') && orderForm.get('typeOrder')?.touched"
+          >
+            typeOrder is required.
+          </div>
+
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="!orderForm.valid"
+              data-bs-dismiss="modal"
+            >
+              Order
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </table>

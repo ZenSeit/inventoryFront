@@ -1,4 +1,7 @@
-<table>
+<div *ngIf="invoices.length === 0">
+  <p>There are no invoices at the moment.</p>
+</div>
+<table *ngIf="invoices.length > 0" class="table table-dark table-hover">
   <thead>
     <tr>
       <th>Fecha</th>
@@ -7,10 +10,18 @@
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let invoice of invoices">
+    <tr *ngFor="let invoice of invoices; let i = index" (click)="onRowClick(i)">
       <td>{{ invoice.date  | date:'short'  }}</td>
       <td >{{ invoice.total }}</td>
       <td >{{ invoice.sellType}}</td>
     </tr>
   </tbody>
 </table>
+<div *ngIf="selectedInvoiceIndex !== -1">
+  <h3>Productos de la factura seleccionada:</h3>
+  <ul>
+    <li *ngFor="let product of invoices[selectedInvoiceIndex].products">
+      {{ product.name }} - {{ product.quantity }}
+    </li>
+  </ul>
+</div>

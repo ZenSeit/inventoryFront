@@ -1,4 +1,95 @@
-<p>
-  HomePage works!
-</p>
+<app-header></app-header>
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center">
+    <div>Branches</div>
+    <button
+      type="button"
+      class="btn btn-primary"
+      data-bs-toggle="modal"
+      data-bs-target="#newBranchModal"
+    >
+      Add branch
+    </button>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="newBranchModal"
+  tabindex="-1"
+  aria-labelledby="newBranchModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="newBranchModalLabel">New Branch</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form
+          [formGroup]="branchForm"
+          (ngSubmit)="!branchForm.invalid && createBranch(branchForm.value)"
+        >
+          <label for="name">Branch name</label>
+          <input
+            novalidate
+            id="name"
+            class="form-control"
+            formControlName="name"
+            placeholder="name"
+          />
+          <div
+            class="alert alert-danger alert-dismissible fade show"
+            *ngIf="branchForm.get('name')?.hasError('minlength')"
+          >
+            Field must contain at least 3 characters."
+          </div>
+          <label for="city">City</label>
+          <input
+            novalidate
+            id="city"
+            class="form-control"
+            formControlName="city"
+            placeholder="city"
+          />
+          <div
+            class="alert alert-danger alert-dismissible fade show"
+            *ngIf="branchForm.get('city')?.hasError('minlength')"
+          >
+            Field must contain at least 3 characters."
+          </div>
+          <label for="country">Country</label>
+          <input
+            novalidate
+            id="country"
+            class="form-control"
+            formControlName="country"
+            placeholder="country"
+          />
+          <div
+            class="alert alert-danger alert-dismissible fade show"
+            *ngIf="branchForm.get('country')?.hasError('minlength')"
+          >
+            Field must contain at least 3 characters."
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="!branchForm.valid"
+            data-bs-dismiss="modal"
+          >
+            Crear</button
+          >&nbsp;
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 <app-branch-list [branches]="branches"></app-branch-list>

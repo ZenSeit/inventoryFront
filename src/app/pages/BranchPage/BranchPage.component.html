@@ -1,2 +1,119 @@
-<app-product-list [productsInBranch]="productsInBranch" ></app-product-list>
-<app-invoice-list [invoices]="invoicesInBranch" ></app-invoice-list>
+<app-header></app-header>
+<div class="banner bg-primary text-white p-3">
+  <div class="row">
+    <div class="col-md-6">
+      <h1>{{ branch?.name }}</h1>
+    </div>
+    <div class="col-md-6 text-md-end">
+      <h4>{{ branch?.location }}</h4>
+    </div>
+  </div>
+</div>
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center">
+    <h3>Products</h3>
+    <button
+      type="button"
+      class="btn btn-primary"
+      data-bs-toggle="modal"
+      data-bs-target="#newProductModal"
+    >
+      Add Product
+    </button>
+  </div>
+</div>
+<div
+  class="modal fade"
+  id="newProductModal"
+  tabindex="-1"
+  aria-labelledby="newProductModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="newProductModalLabel">New Product</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form
+          [formGroup]="productForm"
+          (ngSubmit)="!productForm.invalid && createProduct(productForm.value)"
+        >
+          <label for="name">Product name</label>
+          <input
+            novalidate
+            id="name"
+            class="form-control"
+            formControlName="name"
+            placeholder="name"
+          />
+          <div
+            class="alert alert-danger alert-dismissible fade show"
+            *ngIf="productForm.get('name')?.hasError('minlength')"
+          >
+            Field must contain at least 3 characters."
+          </div>
+          <label for="description">Description</label>
+          <input
+            novalidate
+            id="description"
+            class="form-control"
+            formControlName="description"
+            placeholder="description"
+          />
+          <label for="price">Price</label>
+          <input
+            novalidate
+            id="price"
+            type="number"
+            class="form-control"
+            formControlName="price"
+            placeholder="price"
+          />
+          <div
+            class="alert alert-danger alert-dismissible fade show"
+            *ngIf="productForm.get('price')?.hasError('min')"
+          >
+            Price could not be less than 0."
+          </div>
+          <label for="category">Category</label>
+          <select class="form-control" id="category" formControlName="category">
+            <option value="" disabled>Select a category</option>
+            <option value="General">General</option>
+            <option value="House">House</option>
+            <option value="Heavy">Heavy</option>
+            <!-- Agrega más opciones según sea necesario -->
+          </select>
+          <div
+            class="alert alert-danger alert-dismissible fade show"
+            *ngIf="productForm.get('category')?.hasError('required')"
+          >
+            Category is required.
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="!productForm.valid"
+            data-bs-dismiss="modal"
+          >
+            Add</button
+          >&nbsp;
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<app-product-list [productsInBranch]="productsInBranch"></app-product-list>
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center">
+    <h3>Invoices</h3>
+  </div>
+</div>
+<app-invoice-list [invoices]="invoicesInBranch"></app-invoice-list>

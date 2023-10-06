@@ -1,0 +1,6 @@
+.banner {
+    background-color: #007bff; /* Color de fondo del banner (azul en este caso) */
+    color: #fff; /* Color del texto (blanco en este caso) */
+    padding: 20px; /* Espaciado interno del banner */
+    text-align: left; /* Alineación del texto a la izquierda */
+  }

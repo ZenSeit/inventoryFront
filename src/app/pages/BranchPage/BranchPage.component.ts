@@ -1,9 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { WebSocketSubject } from 'rxjs/webSocket';
+import { Branch } from 'src/app/models/branch';
 import { Invoice } from 'src/app/models/invoice';
 import { Product } from 'src/app/models/product';
 import { StockAdded } from 'src/app/models/stockAdded';
+import { BranchesService } from 'src/app/services/branches/branches.service';
 import { InvoiceService } from 'src/app/services/invoices/invoice.service';
 import { ProductService } from 'src/app/services/product/product.service';
 import { SocketService } from 'src/app/services/socket/socket.service';
@@ -17,19 +20,33 @@ export class BranchPageComponent implements OnInit {
 
   productsInBranch: Product[] = [];
   invoicesInBranch: Invoice[] = [];
+  branch: Branch | undefined;
+  productForm!: FormGroup;
 
   socket?: WebSocketSubject<Product>;
 
   constructor(
     private route: ActivatedRoute,
+    private branchService: BranchesService,
     private productService: ProductService,
     private invoiceService: InvoiceService,
-    private socketService: SocketService
+    private socketService: SocketService,
+    private router: Router,
+    private formBuilder:FormBuilder
   ) {}
 
   ngOnInit() {
     this.getInvoices();
     this.getProducts();
+    this.getBranch();
+
+    this.productForm = this.formBuilder.group({
+      name: ['',[Validators.required,Validators.minLength(3)]],
+      description: [''],
+      price: ['',[Validators.required,Validators.min(0)]],
+      category: [''],
+      branchId: [this.route.snapshot.paramMap.get('id')],
+    });
   }
 
 
@@ -45,6 +62,19 @@ export class BranchPageComponent implements OnInit {
     const id: string | null = this.route.snapshot.paramMap.get('id');
     this.invoiceService.getInvoicesByBranch(id!).subscribe((data) => {
       this.invoicesInBranch = data;
+    });
+  }
+
+  getBranch(){
+    const id: string | null = this.route.snapshot.paramMap.get('id');
+    this.branchService.getBranchById(id!).subscribe((data)=>{
+      this.branch = data;
+      if(!data) this.router.navigate(['/']);
+    })
+  }
+
+  createProduct(newProduct: Product) {
+    this.productService.addProductToBranch(newProduct).subscribe((data) => {
       console.log(data);
     });
   }

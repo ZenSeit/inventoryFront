@@ -3,6 +3,8 @@ import { Branch } from 'src/app/models/branch';
 import { BranchesService } from 'src/app/services/branches/branches.service';
 import { SocketService } from 'src/app/services/socket/socket.service';
 import { WebSocketSubject } from 'rxjs/webSocket';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { NewBranch } from 'src/app/models/newBranch';
 
 @Component({
   selector: 'app-HomePage',
@@ -12,10 +14,11 @@ import { WebSocketSubject } from 'rxjs/webSocket';
 export class HomePageComponent implements OnInit {
 
   @Output() branches:Branch[] = [];
+  branchForm!: FormGroup;
 
   socketManager?:WebSocketSubject<Branch>;
 
-  constructor(private branchService:BranchesService,private socket:SocketService) { }
+  constructor(private branchService:BranchesService,private socket:SocketService,private formBuilder:FormBuilder) { }
 
   ngOnInit() {
     this.branchService.getBranches().subscribe((data)=>{
@@ -24,6 +27,26 @@ export class HomePageComponent implements OnInit {
     } );
 
     this.connectToMainSpace()
+
+    this.branchForm = this.formBuilder.group({
+      name: ['',[Validators.required,Validators.minLength(3)]],
+      city: ['',[Validators.required,Validators.minLength(3)]],
+      country: ['',[Validators.required,Validators.minLength(3)]]
+    });
+  }
+
+  createBranch(newBranch:any){
+    let branchTosend:NewBranch = {
+      name:newBranch.name,
+      location:{
+        city:newBranch.city,
+        country:newBranch.country
+      }
+    
+    }
+    this.branchService.createBranch(branchTosend).subscribe((data)=>{
+      console.log(data);
+    })
   }
 
   connectToMainSpace(){
