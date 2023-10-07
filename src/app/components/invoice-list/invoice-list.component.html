@@ -12,7 +12,7 @@
   <tbody>
     <tr *ngFor="let invoice of invoices; let i = index" (click)="onRowClick(i)">
       <td>{{ invoice.date  | date:'short'  }}</td>
-      <td >{{ invoice.total }}</td>
+      <td >{{ invoice.total | currency }}</td>
       <td >{{ invoice.sellType}}</td>
     </tr>
   </tbody>

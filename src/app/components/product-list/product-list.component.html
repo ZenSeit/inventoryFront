@@ -17,7 +17,7 @@
       <td>{{ product.name }}</td>
       <td>{{ product.description }}</td>
       <td>{{ product.inventoryStock || 0 }}</td>
-      <td>{{ product.price }}</td>
+      <td>{{ product.price | currency }}</td>
       <td>{{ product.category }}</td>
       <td>
         <button
@@ -29,7 +29,7 @@
         >
           +
         </button>
-        <button *ngIf="product.inventoryStock > 0"
+        <button *ngIf="product.inventoryStock < 0"
           type="button"
           (click)="orderProduct(product)"
           class="btn btn-success"
