@@ -1,9 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { JwtHelperService } from '@auth0/angular-jwt';
 import { Order } from 'src/app/models/order';
 import { Product } from 'src/app/models/product';
 import { StockAdded } from 'src/app/models/stockAdded';
 import { ProductService } from 'src/app/services/product/product.service';
+import { TokenService } from 'src/app/services/token/token.service';
 
 @Component({
   selector: 'app-product-list',
@@ -17,10 +19,12 @@ export class ProductListComponent implements OnInit {
   productForm!: FormGroup;
   orderForm!: FormGroup;
   productOrder: Product | undefined;
+  roleUser: string = '';
 
-  constructor(private formBuilder:FormBuilder,private productService:ProductService) { }
+  constructor(private formBuilder:FormBuilder,private productService:ProductService,private tokenService:TokenService,private authJwt:JwtHelperService) { }
 
   ngOnInit() {
+    this.getRole();
     this.productForm = this.formBuilder.group({
       quantity: [1, [Validators.required, Validators.min(1)]]
     });
@@ -43,8 +47,10 @@ export class ProductListComponent implements OnInit {
   onSubmit(quantity: any) {
     let addStock: StockAdded = {
       branchId: this.ProductSelected!.branchId || '',
-      productId: this.ProductSelected!.id || '',
-      quantityToAdd: quantity.quantity,
+      products: [{
+        productId: this.ProductSelected!.id || '',
+        quantity: quantity.quantity,
+      }]
     };
     this.productService.addStockToProduct(addStock).subscribe((data) => {
       this.ProductSelected = undefined;
@@ -71,6 +77,15 @@ export class ProductListComponent implements OnInit {
         this.productOrder = undefined;
       });
     }
+  }
+
+  getRole() {
+    this.tokenService.setToken();
+    this.tokenService.token$.subscribe((data) => {
+      if (data) {
+        this.roleUser = this.authJwt.decodeToken(data).roles;
+      }
+    });
   }
 
 }

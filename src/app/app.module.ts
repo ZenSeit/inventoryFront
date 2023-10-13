@@ -19,6 +19,7 @@ import { LoginPageComponent } from './pages/LoginPage/LoginPage.component';
 import { JWT_OPTIONS, JwtHelperService } from '@auth0/angular-jwt';
 import { NotFoundPageComponent } from './pages/NotFoundPage/NotFoundPage.component';
 import { InterceptorInterceptor } from './interceptor/interceptor.interceptor';
+import { UserListComponent } from './components/user-list/user-list.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { InterceptorInterceptor } from './interceptor/interceptor.interceptor';
     BranchListComponent,
     HeaderComponent,
     ProductListComponent,
+    UserListComponent,
     BranchPageComponent,
     InvoiceListComponent,
     LoginPageComponent,

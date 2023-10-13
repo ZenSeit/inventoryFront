@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { LoginRequest } from 'src/app/models/loginRequest';
 import { TokenService } from 'src/app/services/token/token.service';
 import { UserService } from 'src/app/services/user/user.service';
@@ -17,7 +18,8 @@ export class LoginPageComponent implements OnInit {
     private formBuilder: FormBuilder,
     private userService: UserService,
     private tokenService: TokenService,
-    private router: Router
+    private router: Router,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit() {
@@ -39,6 +41,7 @@ export class LoginPageComponent implements OnInit {
         }, 500);
       },
       (err) => {
+        this.toastr.error("Invalid credentials", 'Error');
         console.log(err);
       }
     );

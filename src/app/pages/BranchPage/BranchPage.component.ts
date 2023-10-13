@@ -9,12 +9,16 @@ import { Invoice } from 'src/app/models/invoice';
 import { Order } from 'src/app/models/order';
 import { Product } from 'src/app/models/product';
 import { ProductSale } from 'src/app/models/productSale';
+import { ProductToAdd } from 'src/app/models/productToAdd';
 import { StockAdded } from 'src/app/models/stockAdded';
+import { User } from 'src/app/models/user';
 import { BranchesService } from 'src/app/services/branches/branches.service';
 import { InvoiceService } from 'src/app/services/invoices/invoice.service';
 import { ProductService } from 'src/app/services/product/product.service';
 import { SocketService } from 'src/app/services/socket/socket.service';
 import { TokenService } from 'src/app/services/token/token.service';
+import { UserService } from 'src/app/services/user/user.service';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-BranchPage',
@@ -25,6 +29,7 @@ export class BranchPageComponent implements OnInit {
   productsInBranch: Product[] = [];
   productsWithStock: Product[] = [];
   invoicesInBranch: Invoice[] = [];
+  usersInBranch: User[] = [];
   branch: Branch | undefined;
   productForm!: FormGroup;
   productoSeleccionado: Product | undefined;
@@ -32,6 +37,7 @@ export class BranchPageComponent implements OnInit {
   orderForm!: FormGroup;
   orderType: string = 'customer';
   roleUser: string = '';
+  inventoryExcel: any;
 
   socket?: WebSocketSubject<Product>;
 
@@ -39,6 +45,7 @@ export class BranchPageComponent implements OnInit {
     private route: ActivatedRoute,
     private branchService: BranchesService,
     private productService: ProductService,
+    private userService: UserService,
     private invoiceService: InvoiceService,
     private socketService: SocketService,
     private router: Router,
@@ -53,6 +60,7 @@ export class BranchPageComponent implements OnInit {
     this.getProducts();
     this.getBranch();
     this.getRole();
+    this.getUser();
 
     this.productForm = this.formBuilder.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
@@ -95,6 +103,13 @@ export class BranchPageComponent implements OnInit {
     });
   }
 
+  getUser(){
+    const id: string | null = this.route.snapshot.paramMap.get('id');
+    this.userService.getUsersByBranch(id!).subscribe((data) => {
+      this.usersInBranch = data;
+    });
+  }
+
   createProduct(newProduct: Product) {
     this.productService.addProductToBranch(newProduct).subscribe((data) => {
       this.toastr.success(`Product ${newProduct.name} created successfully`, 'Success');
@@ -133,13 +148,16 @@ export class BranchPageComponent implements OnInit {
   stockAddedView(message: StockAdded) {
     console.log(message);
     console.log(this.productsInBranch);
-    this.productsInBranch?.forEach((product) => {
-      if (product.id === message.productId) {
-        console.log('agregando');
-        product.inventoryStock += message.quantityToAdd;
-        this.filterProducstWithStock();
-      }
-    });
+
+    message.products.forEach((product) => {
+      this.productsInBranch?.forEach((productInBranch) => {
+        if (product.productId === productInBranch.id) {
+          productInBranch.inventoryStock += product.quantity;
+          this.filterProducstWithStock();
+        }
+      });
+    })
+
   }
 
   reduceStockView(message: Invoice) {
@@ -231,5 +249,42 @@ export class BranchPageComponent implements OnInit {
         this.roleUser = this.authJwt.decodeToken(data).roles;
       }
     });
+  }
+
+  readInventoryExcel(event: any) {
+
+    const file = event.target.files[0];
+
+    let fileReader = new FileReader();
+
+    fileReader.readAsBinaryString(file);
+
+    fileReader.onload = (e) => {
+    
+      var workbook = XLSX.read(fileReader.result, { type: 'binary' });
+      var sheetNames = workbook.SheetNames;
+      let dataExcel = XLSX.utils.sheet_to_json(workbook.Sheets[sheetNames[0]])
+
+      this.inventoryExcel = dataExcel
+      
+    
+    }
+
+  }
+
+  sendExcel(){
+    const branchId: string | null = this.route.snapshot.paramMap.get('id');
+    const stock: StockAdded = {
+      branchId: branchId || '',
+      products: this.inventoryExcel
+    }
+
+    this.productService.addStockToProduct(stock).subscribe((data) => {
+      this.toastr.success('Stock added successfully', 'Success');
+    },
+    (error) => {
+      this.toastr.error('Error adding stock', 'Error');
+    }
+    );
   }
 }

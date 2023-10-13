@@ -10,13 +10,15 @@ import { Observable, catchError, throwError } from 'rxjs';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { Router } from '@angular/router';
 import { TokenService } from '../services/token/token.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Injectable()
 export class InterceptorInterceptor implements HttpInterceptor {
   constructor(
     private jwtAuth: JwtHelperService,
     private router: Router,
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private toastr: ToastrService
   ) {}
 
   intercept(
@@ -42,11 +44,11 @@ export class InterceptorInterceptor implements HttpInterceptor {
                 this.router.navigate(['/login']);
               }
             } else {
-              alert('Credenciales invalidas');
+              this.toastr.error('You must login to access this page', 'Error');
             }
             break;
           default:
-            alert('En el momento no podemos procesar la solicitud');
+            this.toastr.error("Error with this request", 'Error');
         }
         return throwError(error.error);
       })

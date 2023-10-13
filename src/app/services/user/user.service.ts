@@ -9,6 +9,7 @@ import { User } from 'src/app/models/user';
 export class UserService {
   api_service: string = `http://${window._env.SERVICE_URI}`;
   api_auth: string = `http://${window._env.AUTH_URI}`;
+  api_storage: string = `http://${window._env.STORAGE_URI}`;
 
   constructor(private http: HttpClient) {}
 
@@ -25,5 +26,9 @@ export class UserService {
 
   createUser(user: User) {
     return this.http.post(`${this.api_service}/api/v1/user/register`, user);
+  }
+
+  getUsersByBranch(branchId: string) {
+    return this.http.get<User[]>(`${this.api_storage}/api/v1/users/` + branchId);
   }
 }
