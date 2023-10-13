@@ -7,10 +7,12 @@ import { Invoice } from 'src/app/models/invoice';
 })
 export class InvoiceService {
 
+  api_storage: string = `http://${window._env.STORAGE_URI}`;
+
   constructor(private http:HttpClient) { }
 
   getInvoicesByBranch(branchId:string){
-    return this.http.get<Invoice[]>("http://localhost:8081/api/v1/invoice/"+branchId);
+    return this.http.get<Invoice[]>(`${this.api_storage}/api/v1/invoice/`+branchId);
   }
 
 }

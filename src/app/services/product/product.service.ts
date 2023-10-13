@@ -8,36 +8,41 @@ import { StockAdded } from 'src/app/models/stockAdded';
   providedIn: 'root',
 })
 export class ProductService {
+
+
+  api_service: string = `http://${window._env.SERVICE_URI}`;
+  api_storage: string = `http://${window._env.STORAGE_URI}`;
+
   constructor(private http: HttpClient) {}
 
   getProductsByBranchId(id: string) {
-    return this.http.get<Product[]>('http://localhost:8081/api/products/' + id);
+    return this.http.get<Product[]>(`${this.api_storage}/api/products/` + id);
   }
 
   addProductToBranch(product: Product) {
     return this.http.post<Product>(
-      'http://localhost:8080/api/v1/product/register',
+      `${this.api_service}/api/v1/product/register`,
       product
     );
   }
 
   addStockToProduct(stock:StockAdded) {
     return this.http.patch<StockAdded>(
-      'http://localhost:8080/api/v1/product/purchase',
+      `${this.api_service}/api/v1/product/purchase`,
       stock
     );
   }
 
   makeOrderForCustomer(newOrder:Order){
     return this.http.patch<Order>(
-      'http://localhost:8080/api/v1/product/customer-sale',
+      `${this.api_service}/api/v1/product/customer-sale`,
       newOrder
     );
   }
 
   makeOrderForReseller(newOrder:Order){
     return this.http.patch<Order>(
-      'http://localhost:8080/api/v1/product/reseller-sale',
+      `${this.api_service}/api/v1/product/reseller-sale`,
       newOrder
     );
   }

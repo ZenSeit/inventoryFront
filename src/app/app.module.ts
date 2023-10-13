@@ -11,6 +11,7 @@ import { ProductListComponent } from './components/product-list/product-list.com
 import { BranchPageComponent } from './pages/BranchPage/BranchPage.component';
 import { InvoiceListComponent } from './components/invoice-list/invoice-list.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { LoginPageComponent } from './pages/LoginPage/LoginPage.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { ReactiveFormsModule } from '@angular/forms';
     HeaderComponent,
     ProductListComponent,
     BranchPageComponent,
-    InvoiceListComponent
+    InvoiceListComponent,
+    LoginPageComponent
   ],
   imports: [
     BrowserModule,

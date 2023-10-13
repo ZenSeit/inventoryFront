@@ -57,7 +57,12 @@ export class HomePageComponent implements OnInit {
     })
   }
 
-  addBranchToView(branch:Branch){
+  addBranchToView(message:any){
+    const branch:Branch = {
+      id:message.aggregateRootId,
+      name:message.name,
+      location:message.location
+    }
     this.branches.unshift(branch);
   }
 

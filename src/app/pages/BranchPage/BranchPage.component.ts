@@ -106,13 +106,25 @@ export class BranchPageComponent implements OnInit {
     }
   }
 
-  addProductView(newProduct: Product) {
-    this.productsInBranch?.unshift(newProduct);
+  addProductView(newProduct: any) {
+    const product: Product = {
+      id: newProduct.productId,
+      name: newProduct.name,
+      description: newProduct.description,
+      inventoryStock: newProduct.inventoryStock || 0,
+      price: newProduct.price,
+      category: newProduct.category,
+      branchId: newProduct.aggregateRootId,
+    };
+    this.productsInBranch?.unshift(product);
   }
 
   stockAddedView(message: StockAdded) {
+    console.log(message);
+    console.log(this.productsInBranch);
     this.productsInBranch?.forEach((product) => {
       if (product.id === message.productId) {
+        console.log("agregando");
         product.inventoryStock += message.quantityToAdd;
         this.filterProducstWithStock();
       }

@@ -9,14 +9,16 @@ import { Product } from 'src/app/models/product';
 })
 export class SocketService {
 
+  api_socket: string = `WS://${window._env.SOCKET_URI}`;
+
 constructor() { }
 
 connetToGeneralSpace():WebSocketSubject<Branch>{
-  return webSocket('WS://localhost:8082/retrieve/mainSpace');
+  return webSocket(`${this.api_socket}/retrieve/mainSpace`);
 }
 
 connetToSpecificSpace(branch:string):WebSocketSubject<any>{
-  return webSocket(`WS://localhost:8082/retrieve/${branch}`);
+  return webSocket(`${this.api_socket}/retrieve/${branch}`);
 }
 
 }
