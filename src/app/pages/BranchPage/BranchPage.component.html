@@ -17,6 +17,7 @@
       class="btn btn-primary"
       data-bs-toggle="modal"
       data-bs-target="#newProductModal"
+      *ngIf="roleUser!=='SELLER'"
     >
       Add Product
     </button>

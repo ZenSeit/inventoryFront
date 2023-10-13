@@ -10,8 +10,18 @@
     >
       Add branch
     </button>
+    <button
+      type="button"
+      class="btn btn-warning"
+      data-bs-toggle="modal"
+      data-bs-target="#newUserModal"
+    >
+      Add User
+    </button>
   </div>
 </div>
+
+
 
 <div
   class="modal fade"
@@ -83,6 +93,114 @@
             type="submit"
             class="btn btn-primary"
             [disabled]="!branchForm.valid"
+            data-bs-dismiss="modal"
+          >
+            Crear</button
+          >&nbsp;
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="newUserModal"
+  tabindex="-1"
+  aria-labelledby="newUserModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="newUserModalLabel">New user</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form
+          [formGroup]="userForm"
+          (ngSubmit)="!userForm.invalid && createUser(userForm.value)"
+        >
+          <label for="name">Name</label>
+          <input
+            novalidate
+            id="nameUser"
+            class="form-control"
+            formControlName="name"
+            placeholder="name"
+          />
+          <div
+            class="alert alert-danger alert-dismissible fade show"
+            *ngIf="branchForm.get('name')?.hasError('minlength')"
+          >
+            Field must contain at least 3 characters."
+          </div>
+          <label for="lastname">Lastname</label>
+          <input
+            novalidate
+            id="lastname"
+            class="form-control"
+            formControlName="lastName"
+            placeholder="Lastname"
+          />
+          <div
+            class="alert alert-danger alert-dismissible fade show"
+            *ngIf="branchForm.get('lastname')?.hasError('minlength')"
+          >
+            Field must contain at least 3 characters."
+          </div>
+          <label for="password">Password</label>
+          <input
+          type="password"
+            novalidate
+            id="password"
+            class="form-control"
+            formControlName="password"
+            placeholder="password"
+          />
+          <div
+            class="alert alert-danger alert-dismissible fade show"
+            *ngIf="branchForm.get('password')?.hasError('minlength')"
+          >
+            Field must contain at least 8 characters."
+          </div>
+          <label for="email">Email</label>
+          <input
+          type="email"
+            novalidate
+            id="email"
+            class="form-control"
+            formControlName="email"
+            placeholder="email"
+          />
+          <div
+            class="alert alert-danger alert-dismissible fade show"
+            *ngIf="branchForm.get('email')?.hasError('email')"
+          >
+            Type a valid email. 
+          </div>
+          <label for="rol">Rol</label>
+          <select class="form-control" id="rol" formControlName="role">
+            <option value="" disabled>Select a rol</option>
+            <option value="ADMIN">Admin</option>
+            <option value="SELLER">Seller</option>
+            <option value="SUPER">Super</option>
+          </select>
+
+          <label for="branches">Branch</label>
+          <select class="form-control" id="branchId" formControlName="branchId">
+            <option value="" disabled>Select a branch</option>
+            <option *ngFor="let branch of branches" [value]="branch.id">{{ branch.name }}</option>
+          </select>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="!userForm.valid"
             data-bs-dismiss="modal"
           >
             Crear</button

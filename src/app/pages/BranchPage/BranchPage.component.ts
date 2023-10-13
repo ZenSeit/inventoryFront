@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { JwtHelperService } from '@auth0/angular-jwt';
+import { ToastrService } from 'ngx-toastr';
 import { WebSocketSubject } from 'rxjs/webSocket';
 import { Branch } from 'src/app/models/branch';
 import { Invoice } from 'src/app/models/invoice';
@@ -12,6 +14,7 @@ import { BranchesService } from 'src/app/services/branches/branches.service';
 import { InvoiceService } from 'src/app/services/invoices/invoice.service';
 import { ProductService } from 'src/app/services/product/product.service';
 import { SocketService } from 'src/app/services/socket/socket.service';
+import { TokenService } from 'src/app/services/token/token.service';
 
 @Component({
   selector: 'app-BranchPage',
@@ -28,6 +31,7 @@ export class BranchPageComponent implements OnInit {
   productosSeleccionados: ProductSale[] = [];
   orderForm!: FormGroup;
   orderType: string = 'customer';
+  roleUser: string = '';
 
   socket?: WebSocketSubject<Product>;
 
@@ -38,13 +42,17 @@ export class BranchPageComponent implements OnInit {
     private invoiceService: InvoiceService,
     private socketService: SocketService,
     private router: Router,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private tokenService: TokenService,
+    private authJwt: JwtHelperService,
+    private toastr: ToastrService,
   ) {}
 
   ngOnInit() {
     this.getInvoices();
     this.getProducts();
     this.getBranch();
+    this.getRole();
 
     this.productForm = this.formBuilder.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
@@ -66,7 +74,10 @@ export class BranchPageComponent implements OnInit {
       this.productsInBranch = data;
       this.filterProducstWithStock();
       this.connectToChannel(id!);
-    });
+    },
+    (error) => {
+      this.toastr.error('Error connecting with inventory', 'Error');
+    })
   }
 
   getInvoices() {
@@ -86,7 +97,7 @@ export class BranchPageComponent implements OnInit {
 
   createProduct(newProduct: Product) {
     this.productService.addProductToBranch(newProduct).subscribe((data) => {
-      console.log(data);
+      this.toastr.success(`Product ${newProduct.name} created successfully`, 'Success');
     });
   }
 
@@ -124,7 +135,7 @@ export class BranchPageComponent implements OnInit {
     console.log(this.productsInBranch);
     this.productsInBranch?.forEach((product) => {
       if (product.id === message.productId) {
-        console.log("agregando");
+        console.log('agregando');
         product.inventoryStock += message.quantityToAdd;
         this.filterProducstWithStock();
       }
@@ -202,12 +213,23 @@ export class BranchPageComponent implements OnInit {
       this.productService.makeOrderForCustomer(newOrder).subscribe((data) => {
         this.productosSeleccionados = [];
         this.filterProducstWithStock();
+        this.toastr.success('Final customer order created successfully', 'Success');
       });
     } else {
       this.productService.makeOrderForReseller(newOrder).subscribe((data) => {
         this.productosSeleccionados = [];
         this.filterProducstWithStock();
+        this.toastr.success('Reseller order created successfully', 'Success');
       });
     }
+  }
+
+  getRole() {
+    this.tokenService.setToken();
+    this.tokenService.token$.subscribe((data) => {
+      if (data) {
+        this.roleUser = this.authJwt.decodeToken(data).roles;
+      }
+    });
   }
 }

@@ -1,6 +1,10 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http'
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http'
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ToastrModule } from 'ngx-toastr';
+
+
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -12,6 +16,9 @@ import { BranchPageComponent } from './pages/BranchPage/BranchPage.component';
 import { InvoiceListComponent } from './components/invoice-list/invoice-list.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { LoginPageComponent } from './pages/LoginPage/LoginPage.component';
+import { JWT_OPTIONS, JwtHelperService } from '@auth0/angular-jwt';
+import { NotFoundPageComponent } from './pages/NotFoundPage/NotFoundPage.component';
+import { InterceptorInterceptor } from './interceptor/interceptor.interceptor';
 
 @NgModule({
   declarations: [
@@ -22,16 +29,31 @@ import { LoginPageComponent } from './pages/LoginPage/LoginPage.component';
     ProductListComponent,
     BranchPageComponent,
     InvoiceListComponent,
-    LoginPageComponent
+    LoginPageComponent,
+    NotFoundPageComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    ToastrModule.forRoot({
+      timeOut: 7000,
+      positionClass: 'toast-bottom-right',
+      preventDuplicates: true,
+    }),
+    BrowserAnimationsModule
 
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: InterceptorInterceptor,
+      multi: true
+    },
+    { provide: JWT_OPTIONS, useValue: JWT_OPTIONS },
+    JwtHelperService,
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
