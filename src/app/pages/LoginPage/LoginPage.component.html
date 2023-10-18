@@ -6,23 +6,47 @@
         <div class="card-header">Inicio de Sesión</div>
         <div class="card-body">
           <!-- Formulario de Inicio de Sesión -->
-          <form [formGroup]="loginForm"
-          (ngSubmit)="!loginForm.invalid && login(loginForm.value)">
+          <form
+            [formGroup]="loginForm"
+            (ngSubmit)="!loginForm.invalid && login(loginForm.value)"
+          >
             <div class="mb-3">
               <label for="email" class="form-label">Correo Electrónico</label>
-              <input novalidate type="email" formControlName="email" class="form-control" id="email" placeholder="@email" required>
+              <input
+                novalidate
+                type="email"
+                formControlName="email"
+                class="form-control"
+                id="email"
+                placeholder="@email"
+                required
+              />
               <div
-            class="alert alert-danger alert-dismissible fade show"
-            *ngIf="loginForm.get('email')?.hasError('email')"
-          >
-            Email is invalid. Type a email like: abc@email.com
-          </div>
+                class="alert alert-danger alert-dismissible fade show"
+                *ngIf="loginForm.get('email')?.hasError('email')"
+              >
+                Email is invalid. Type a email like: abc@email.com
+              </div>
             </div>
             <div class="mb-3">
               <label for="password" class="form-label">Contraseña</label>
-              <input  novalidate type="password" formControlName="password" class="form-control" id="password" placeholder="password" required>
+              <input
+                novalidate
+                type="password"
+                formControlName="password"
+                class="form-control"
+                id="password"
+                placeholder="password"
+                required
+              />
             </div>
-            <button type="submit" class="btn btn-success" [disabled]="!loginForm.valid">Sign in</button>
+            <button
+              type="submit"
+              class="btn btn-success"
+              [disabled]="!loginForm.valid"
+            >
+              Sign in
+            </button>
           </form>
           <!-- Fin del Formulario -->
         </div>

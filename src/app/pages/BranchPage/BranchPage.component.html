@@ -17,7 +17,7 @@
       class="btn btn-primary"
       data-bs-toggle="modal"
       data-bs-target="#newProductModal"
-      *ngIf="roleUser!=='SELLER'"
+      *ngIf="roleUser !== 'SELLER'"
     >
       Add Product
     </button>
@@ -26,7 +26,7 @@
       class="btn btn-success"
       data-bs-toggle="modal"
       data-bs-target="#newOrderModal"
-      *ngIf="productsWithStock.length>0"
+      *ngIf="productsWithStock.length > 0"
     >
       new Order
     </button>
@@ -36,16 +36,11 @@
       class="btn btn-dark"
       data-bs-toggle="modal"
       data-bs-target="#inventoryModal"
-      *ngIf="roleUser!=='SELLER'"
+      *ngIf="roleUser !== 'SELLER'"
     >
       Upload inventory
     </button>
-
-
-
   </div>
-
-
 </div>
 <div
   class="modal fade"
@@ -136,7 +131,6 @@
   </div>
 </div>
 
-
 <div
   class="modal fade"
   id="inventoryModal"
@@ -147,7 +141,9 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="inventoryModalLabel">Upload inventory from Excel</h5>
+        <h5 class="modal-title" id="inventoryModalLabel">
+          Upload inventory from Excel
+        </h5>
         <button
           type="button"
           class="btn-close"
@@ -156,7 +152,6 @@
         ></button>
       </div>
       <div class="modal-body">
-
         <input type="file" (change)="readInventoryExcel($event)" />
 
         <button
@@ -164,25 +159,34 @@
           class="btn btn-primary"
           (click)="sendExcel()"
           data-bs-dismiss="modal"
-        >Upload</button>
-        
+        >
+          Upload
+        </button>
       </div>
     </div>
   </div>
 </div>
 
-<div style="display: flex;">
+<div style="display: flex">
   <!-- Parte izquierda - Tabla 1 -->
-  <div style="flex: 1; padding-right: 10px;">
+  <div style="flex: 1; padding-right: 10px">
     <app-product-list [productsInBranch]="productsInBranch"></app-product-list>
-
   </div>
 
-  <div style="flex: 1; padding-left: 10px;" *ngIf="roleUser !=='SELLER'">
+  <div style="flex: 1; padding-left: 10px" *ngIf="roleUser !== 'SELLER'">
     <app-user-list [usersInBranch]="usersInBranch"></app-user-list>
   </div>
 </div>
 
+<button
+  type="button"
+  class="btn btn-success"
+  data-bs-toggle="modal"
+  data-bs-target="#generateReportModal"
+  *ngIf="productsInBranch.length > 0"
+>
+  Generate Report
+</button>
 
 <div class="container mt-5">
   <div class="d-flex justify-content-between align-items-center">
@@ -279,6 +283,19 @@
               <option value="reseller">Reseller</option>
               <!-- Agrega más opciones según sea necesario -->
             </select>
+            <div class="mb-3">
+              <label for="email" class="form-label">Correo Electrónico</label>
+              <input
+                #emailInput
+                novalidate
+                type="email"
+                class="form-control"
+                id="email"
+                placeholder="@email"
+                (change)="onTypeEmailChange(emailInput.value)"
+                required
+              />
+            </div>
           </div>
           <div class="modal-footer">
             <button
@@ -299,6 +316,155 @@
             </button>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="generateReportModal"
+  tabindex="-1"
+  aria-labelledby="generateReportModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="generateReportModalLabel">Report</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form
+          [formGroup]="reportForm"
+          (ngSubmit)="!reportForm.invalid && generateReport(reportForm.value)"
+        >
+        <h3>Filter for products</h3>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <div class="input-group-text">
+                <label>Category </label>
+                <input
+                  type="checkbox"
+                  aria-label="Checkbox for following text input"
+                  formControlName="filterCategory"
+                />
+              </div>
+            </div>
+            <select
+              class="form-control"
+              id="category2"
+              formControlName="category"
+            >
+              <option value="" disabled>all</option>
+              <option value="General">General</option>
+              <option value="House">House</option>
+              <option value="Heavy">Heavy</option>
+              <!-- Agrega más opciones según sea necesario -->
+            </select>
+          </div>
+
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <div class="input-group-text">
+                <label>Less price than:</label>
+                <input
+                  type="checkbox"
+                  aria-label="Checkbox for following text input"
+                  formControlName="filterPrice"
+                />
+              </div>
+            </div>
+            <input
+              type="number"
+              novalidate
+              id="price2"
+              class="form-control"
+              formControlName="priceLessThan"
+              placeholder="Price"
+            />
+          </div>
+
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <div class="input-group-text">
+                <label>Less stock than:</label>
+                <input
+                  type="checkbox"
+                  aria-label="Checkbox for following text input"
+                  formControlName="filterStock"
+                />
+              </div>
+            </div>
+            <input
+              type="number"
+              novalidate
+              id="stock2"
+              class="form-control"
+              formControlName="stockLessThan"
+              placeholder="Stock"
+            />
+          </div>
+
+          <h3>Filters for invoices</h3>
+
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <div class="input-group-text">
+                <label>Order type</label>
+                <input
+                  type="checkbox"
+                  aria-label="Checkbox for following text input"
+                  formControlName="filterOrder"
+                />
+              </div>
+            </div>
+            <select
+              class="form-control"
+              id="orderType2"
+              formControlName="sellType"
+            >
+              <option value="" disabled>all</option>
+              <option value="reseller">Reseller</option>
+              <option value="final">customer</option>
+            </select>
+          </div>
+
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <div class="input-group-text">
+                <label>Less total than:</label>
+                <input
+                  type="checkbox"
+                  aria-label="Checkbox for following text input"
+                  formControlName="filterTotalOrder"
+                />
+              </div>
+            </div>
+            <input
+              type="number"
+              novalidate
+              id="total2"
+              class="form-control"
+              formControlName="totalOrder"
+              placeholder="total order"
+            />
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="!reportForm.valid"
+            data-bs-dismiss="modal"
+          >
+            Add
+          </button>
+        </form>
       </div>
     </div>
   </div>

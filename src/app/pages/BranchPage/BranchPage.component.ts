@@ -19,6 +19,8 @@ import { SocketService } from 'src/app/services/socket/socket.service';
 import { TokenService } from 'src/app/services/token/token.service';
 import { UserService } from 'src/app/services/user/user.service';
 import * as XLSX from 'xlsx';
+import jsPDF from "jspdf";
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-BranchPage',
@@ -35,9 +37,11 @@ export class BranchPageComponent implements OnInit {
   productoSeleccionado: Product | undefined;
   productosSeleccionados: ProductSale[] = [];
   orderForm!: FormGroup;
+  reportForm!: FormGroup;
   orderType: string = 'customer';
   roleUser: string = '';
   inventoryExcel: any;
+  emailCustomer: string = '';
 
   socket?: WebSocketSubject<Product>;
 
@@ -52,7 +56,7 @@ export class BranchPageComponent implements OnInit {
     private formBuilder: FormBuilder,
     private tokenService: TokenService,
     private authJwt: JwtHelperService,
-    private toastr: ToastrService,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit() {
@@ -74,18 +78,34 @@ export class BranchPageComponent implements OnInit {
       product: [''],
       quantity: [''],
     });
+
+    this.reportForm = this.formBuilder.group({
+      category: [''],
+      filterCategory: [false],
+      stockLessThan: [''],
+      filterStock: [false],
+      priceLessThan: [''],
+      filterPrice: [false],
+      sellType: [''],
+      filterOrder: [false],
+      totalOrder: [''],
+      filterTotalOrder: [false],
+
+    });
   }
 
   getProducts() {
     const id: string | null = this.route.snapshot.paramMap.get('id');
-    this.productService.getProductsByBranchId(id!).subscribe((data) => {
-      this.productsInBranch = data;
-      this.filterProducstWithStock();
-      this.connectToChannel(id!);
-    },
-    (error) => {
-      this.toastr.error('Error connecting with inventory', 'Error');
-    })
+    this.productService.getProductsByBranchId(id!).subscribe(
+      (data) => {
+        this.productsInBranch = data;
+        this.filterProducstWithStock();
+        this.connectToChannel(id!);
+      },
+      (error) => {
+        this.toastr.error('Error connecting with inventory', 'Error');
+      }
+    );
   }
 
   getInvoices() {
@@ -103,7 +123,7 @@ export class BranchPageComponent implements OnInit {
     });
   }
 
-  getUser(){
+  getUser() {
     const id: string | null = this.route.snapshot.paramMap.get('id');
     this.userService.getUsersByBranch(id!).subscribe((data) => {
       this.usersInBranch = data;
@@ -112,7 +132,10 @@ export class BranchPageComponent implements OnInit {
 
   createProduct(newProduct: Product) {
     this.productService.addProductToBranch(newProduct).subscribe((data) => {
-      this.toastr.success(`Product ${newProduct.name} created successfully`, 'Success');
+      this.toastr.success(
+        `Product ${newProduct.name} created successfully`,
+        'Success'
+      );
     });
   }
 
@@ -156,8 +179,7 @@ export class BranchPageComponent implements OnInit {
           this.filterProducstWithStock();
         }
       });
-    })
-
+    });
   }
 
   reduceStockView(message: Invoice) {
@@ -209,6 +231,10 @@ export class BranchPageComponent implements OnInit {
     this.orderType = value || 'customer';
   }
 
+  onTypeEmailChange(value: any) {
+    this.emailCustomer = value || '';
+  }
+
   filterProducstWithStock() {
     this.productsWithStock = this.productsInBranch.filter(
       (product) => product.inventoryStock > 0
@@ -227,17 +253,33 @@ export class BranchPageComponent implements OnInit {
       products: this.productosSeleccionados,
     };
 
+    let messageForEmail = `<h3>Products:</h3> <br>
+    <ul>
+    ${this.productosSeleccionados.map((product) => {
+      return `<li>${product.name} - ${product.quantity}</li>`;
+    })}
+    </ul>
+    `;
+
+    console.log(this.emailCustomer);
+    console.log(messageForEmail);
+
     if (this.orderType === 'customer') {
       this.productService.makeOrderForCustomer(newOrder).subscribe((data) => {
         this.productosSeleccionados = [];
         this.filterProducstWithStock();
-        this.toastr.success('Final customer order created successfully', 'Success');
+        this.toastr.success(
+          'Final customer order created successfully',
+          'Success'
+        );
+        this.invoiceService.sendEmail(this.emailCustomer, messageForEmail);
       });
     } else {
       this.productService.makeOrderForReseller(newOrder).subscribe((data) => {
         this.productosSeleccionados = [];
         this.filterProducstWithStock();
         this.toastr.success('Reseller order created successfully', 'Success');
+        this.invoiceService.sendEmail(this.emailCustomer, messageForEmail);
       });
     }
   }
@@ -252,7 +294,6 @@ export class BranchPageComponent implements OnInit {
   }
 
   readInventoryExcel(event: any) {
-
     const file = event.target.files[0];
 
     let fileReader = new FileReader();
@@ -260,31 +301,100 @@ export class BranchPageComponent implements OnInit {
     fileReader.readAsBinaryString(file);
 
     fileReader.onload = (e) => {
-    
       var workbook = XLSX.read(fileReader.result, { type: 'binary' });
       var sheetNames = workbook.SheetNames;
-      let dataExcel = XLSX.utils.sheet_to_json(workbook.Sheets[sheetNames[0]])
+      let dataExcel = XLSX.utils.sheet_to_json(workbook.Sheets[sheetNames[0]]);
 
-      this.inventoryExcel = dataExcel
-      
-    
-    }
-
+      this.inventoryExcel = dataExcel;
+    };
   }
 
-  sendExcel(){
+  sendExcel() {
     const branchId: string | null = this.route.snapshot.paramMap.get('id');
     const stock: StockAdded = {
       branchId: branchId || '',
-      products: this.inventoryExcel
+      products: this.inventoryExcel,
+    };
+
+    this.productService.addStockToProduct(stock).subscribe(
+      (data) => {
+        this.toastr.success('Stock added successfully', 'Success');
+      },
+      (error) => {
+        this.toastr.error('Error adding stock', 'Error');
+      }
+    );
+  }
+
+  generateReport(filters: any) {
+    let productosFiltrados = this.productsInBranch;
+    let invoicesFiltradas = this.invoicesInBranch;
+
+    if (filters.filterCategory) {
+      productosFiltrados = productosFiltrados.filter(
+        (producto) => producto.category === filters.category
+      );
     }
 
-    this.productService.addStockToProduct(stock).subscribe((data) => {
-      this.toastr.success('Stock added successfully', 'Success');
-    },
-    (error) => {
-      this.toastr.error('Error adding stock', 'Error');
+    if (filters.filterPrice) {
+      productosFiltrados = productosFiltrados.filter(
+        (producto) => producto.price <= filters.priceLessThan
+      );
+    }
+
+    if (filters.filterStock) {
+      productosFiltrados = productosFiltrados.filter(
+        (producto) => producto.inventoryStock <= filters.stockLessThan
+      );
+    }
+
+    if(filters.filterOrder){
+      invoicesFiltradas = invoicesFiltradas.filter(
+        (invoice) => invoice.sellType.toLowerCase().includes(filters.sellType)
+      );
+    }
+
+    if(filters.filterTotalOrder){
+      invoicesFiltradas = invoicesFiltradas.filter(
+        (invoice) => invoice.total <= filters.totalOrder
+      );
+    }
+
+    const doc = new jsPDF(
+      {
+        orientation: 'l',
+        unit: 'mm',
+        format: 'letter',
+       }
+    );
+
+    let bodyTable = productosFiltrados.map(producto =>{
+      return [producto.id || '', producto.name, producto.description, producto.inventoryStock.toString(), producto.price.toString(), producto.category]
+    });
+
+    
+    doc.text(`Informe sucursal ${this.branch?.name} - ${this.branch?.location}`, 10, 10);
+
+
+    autoTable(doc,{
+      startY: 30,
+      head: [['id', 'name', 'description', 'inventoryStock', 'price', 'category']],
+      body: [...bodyTable],
+    })
+
+
+    bodyTable = invoicesFiltradas.map(invoice =>{
+      return [invoice.sellType, invoice.total.toString(), invoice.date.toString()]
     }
     );
+
+
+    autoTable(doc,{
+      head: [['Tipo de venta', 'total', 'date']],
+      body: [...bodyTable],
+    })
+
+
+    doc.save('report.pdf');
   }
 }

@@ -14,7 +14,7 @@ import { HomePageComponent } from './pages/HomePage/HomePage.component';
 import { ProductListComponent } from './components/product-list/product-list.component';
 import { BranchPageComponent } from './pages/BranchPage/BranchPage.component';
 import { InvoiceListComponent } from './components/invoice-list/invoice-list.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LoginPageComponent } from './pages/LoginPage/LoginPage.component';
 import { JWT_OPTIONS, JwtHelperService } from '@auth0/angular-jwt';
 import { NotFoundPageComponent } from './pages/NotFoundPage/NotFoundPage.component';
@@ -44,7 +44,8 @@ import { UserListComponent } from './components/user-list/user-list.component';
       positionClass: 'toast-bottom-right',
       preventDuplicates: true,
     }),
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    FormsModule
 
   ],
   providers: [
