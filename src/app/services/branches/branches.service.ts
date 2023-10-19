@@ -10,8 +10,8 @@ import { WindowEnv } from 'src/app/models/windowEnv';
 })
 export class BranchesService {
 
-  api_service: string = `http://${window._env.SERVICE_URI}`;
-  api_storage: string = `http://${window._env.STORAGE_URI}`;
+  api_service: string = `http://${window?._env.SERVICE_URI || 'localhost:8080'}`;
+  api_storage: string = `http://${window?._env.STORAGE_URI || 'localhost:8081'}`;
 
 constructor(private http:HttpClient) { }
 

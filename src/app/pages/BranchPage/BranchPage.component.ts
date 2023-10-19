@@ -261,8 +261,6 @@ export class BranchPageComponent implements OnInit {
     </ul>
     `;
 
-    console.log(this.emailCustomer);
-    console.log(messageForEmail);
 
     if (this.orderType === 'customer') {
       this.productService.makeOrderForCustomer(newOrder).subscribe((data) => {
@@ -377,7 +375,7 @@ export class BranchPageComponent implements OnInit {
 
 
     autoTable(doc,{
-      startY: 30,
+      startY: 15,
       head: [['id', 'name', 'description', 'inventoryStock', 'price', 'category']],
       body: [...bodyTable],
     })

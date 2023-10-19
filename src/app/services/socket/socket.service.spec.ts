@@ -1,16 +1,35 @@
-/* tslint:disable:no-unused-variable */
-
-import { TestBed, async, inject } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { SocketService } from './socket.service';
+import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
+import { Branch } from 'src/app/models/branch';
 
-describe('Service: Socket', () => {
+describe('SocketService', () => {
+  let service: SocketService;
+
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [SocketService]
+      providers: [SocketService],
     });
+    service = TestBed.inject(SocketService);
   });
 
-  it('should ...', inject([SocketService], (service: SocketService) => {
+  it('should be created', () => {
     expect(service).toBeTruthy();
-  }));
+  });
+
+  it('should connect to general space', () => {
+    const webSocketSubject: WebSocketSubject<Branch> = service.connetToGeneralSpace();
+
+    expect(webSocketSubject).toBeTruthy();
+    expect(webSocketSubject instanceof WebSocketSubject).toBe(true);
+  });
+
+  it('should connect to specific space', () => {
+    const branchId = 'testBranch';
+    const webSocketSubject: WebSocketSubject<any> = service.connetToSpecificSpace(branchId);
+
+    expect(webSocketSubject).toBeTruthy();
+    expect(webSocketSubject instanceof WebSocketSubject).toBe(true);
+  });
 });
+
