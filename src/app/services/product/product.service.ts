@@ -13,6 +13,9 @@ export class ProductService {
   api_service: string = `http://${window._env.SERVICE_URI}`;
   api_storage: string = `http://${window._env.STORAGE_URI}`;
 
+  // api_service: string = `http://localhost:8080`;
+  // api_storage: string = `http://localhost:8081`;
+
   constructor(private http: HttpClient) {}
 
   getProductsByBranchId(id: string) {

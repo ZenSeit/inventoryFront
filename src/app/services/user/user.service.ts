@@ -7,9 +7,14 @@ import { User } from 'src/app/models/user';
   providedIn: 'root',
 })
 export class UserService {
+  
   api_service: string = `http://${window._env.SERVICE_URI}`;
   api_auth: string = `http://${window._env.AUTH_URI}`;
   api_storage: string = `http://${window._env.STORAGE_URI}`;
+
+  // api_service: string = `http://localhost:8080`;
+  // api_storage: string = `http://localhost:8081`;
+  // api_auth: string = `http://localhost:8083`;
 
   constructor(private http: HttpClient) {}
 
@@ -29,6 +34,8 @@ export class UserService {
   }
 
   getUsersByBranch(branchId: string) {
-    return this.http.get<User[]>(`${this.api_storage}/api/v1/users/` + branchId);
+    return this.http.get<User[]>(
+      `${this.api_storage}/api/v1/users/` + branchId
+    );
   }
 }

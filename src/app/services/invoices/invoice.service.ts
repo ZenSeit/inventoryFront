@@ -10,6 +10,8 @@ export class InvoiceService {
 
   api_storage: string = `http://${window._env.STORAGE_URI}`;
 
+  // api_storage: string = `http://localhost:8081`;
+
   constructor(private http:HttpClient) { }
 
   getInvoicesByBranch(branchId:string){

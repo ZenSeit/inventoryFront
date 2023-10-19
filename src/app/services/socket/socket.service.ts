@@ -11,6 +11,8 @@ export class SocketService {
 
   api_socket: string = `WS://${window._env.SOCKET_URI}`;
 
+  // api_socket: string = `WS://localhost:8082`;
+
 constructor() { }
 
 connetToGeneralSpace():WebSocketSubject<Branch>{
