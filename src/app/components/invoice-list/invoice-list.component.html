@@ -4,9 +4,9 @@
 <table *ngIf="invoices.length > 0" class="table table-dark table-hover">
   <thead>
     <tr>
-      <th>Fecha</th>
+      <th>Date</th>
       <th>Total</th>
-      <th>Tipo de venta</th>
+      <th>Type order</th>
     </tr>
   </thead>
   <tbody>
@@ -18,7 +18,7 @@
   </tbody>
 </table>
 <div *ngIf="selectedInvoiceIndex !== -1">
-  <h3>Productos de la factura seleccionada:</h3>
+  <h3>Products in invoice:</h3>
   <ul>
     <li *ngFor="let product of invoices[selectedInvoiceIndex].products">
       {{ product.name }} - {{ product.quantity }}

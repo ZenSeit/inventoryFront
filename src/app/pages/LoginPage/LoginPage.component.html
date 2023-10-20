@@ -3,7 +3,7 @@
   <div class="row justify-content-center">
     <div class="col-md-6">
       <div class="card">
-        <div class="card-header">Inicio de Sesión</div>
+        <div class="card-header">Sign in</div>
         <div class="card-body">
           <!-- Formulario de Inicio de Sesión -->
           <form
@@ -11,7 +11,7 @@
             (ngSubmit)="!loginForm.invalid && login(loginForm.value)"
           >
             <div class="mb-3">
-              <label for="email" class="form-label">Correo Electrónico</label>
+              <label for="email" class="form-label">Email</label>
               <input
                 novalidate
                 type="email"
@@ -29,7 +29,7 @@
               </div>
             </div>
             <div class="mb-3">
-              <label for="password" class="form-label">Contraseña</label>
+              <label for="password" class="form-label">Password</label>
               <input
                 novalidate
                 type="password"

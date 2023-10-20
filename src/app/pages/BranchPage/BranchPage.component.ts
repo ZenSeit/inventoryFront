@@ -371,7 +371,7 @@ export class BranchPageComponent implements OnInit {
     });
 
     
-    doc.text(`Informe sucursal ${this.branch?.name} - ${this.branch?.location}`, 10, 10);
+    doc.text(`Branch report ${this.branch?.name} - ${this.branch?.location}`, 10, 10);
 
 
     autoTable(doc,{
@@ -388,7 +388,7 @@ export class BranchPageComponent implements OnInit {
 
 
     autoTable(doc,{
-      head: [['Tipo de venta', 'total', 'date']],
+      head: [['Order type', 'total', 'date']],
       body: [...bodyTable],
     })
 
